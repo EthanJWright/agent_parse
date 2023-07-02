@@ -1,5 +1,6 @@
-use std::env;
 use colored::*;
+use std::env;
+extern crate shellexpand;
 
 mod log_parser;
 
@@ -7,7 +8,9 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 4 {
-        eprintln!("Usage: cargo run -- --input=<input_file> --include_flags=<flags> [--require_output]");
+        eprintln!(
+            "Usage: cargo run -- --input=<input_file> --include_flags=<flags> [--require_output]"
+        );
         return;
     }
 
@@ -30,9 +33,11 @@ fn main() {
         return;
     }
 
-    if let Ok(nodes) = log_parser::parse_log_file(input_file) {
+    if let Ok(nodes) = log_parser::parse_log_file(&shellexpand::tilde(input_file)) {
         let mut filters: Vec<Box<dyn Fn(&log_parser::Node) -> bool>> = Vec::new();
-        filters.push(Box::new(move |node| log_parser::has_matching_flags(node, &include_flags)));
+        filters.push(Box::new(move |node| {
+            log_parser::has_matching_flags(node, &include_flags)
+        }));
 
         if require_output {
             filters.push(Box::new(log_parser::has_output));
@@ -47,4 +52,3 @@ fn main() {
         eprintln!("Error parsing log file");
     }
 }
-

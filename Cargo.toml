@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 regex = "1.5"
 colored = "2.0"
+shellexpand = "1.0"
 
 [profile.release]
 opt-level = "z"
