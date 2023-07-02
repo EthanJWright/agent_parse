@@ -100,9 +100,30 @@ fn parse_log_file(file_path: &str) -> io::Result<Vec<Node>> {
     Ok(nodes.clone())
 }
 
+fn filter_nodes_by_flags(nodes: &[Node], flags: &[String]) -> Vec<Node> {
+    nodes
+        .iter()
+        .filter(|node| {
+            flags.iter().any(|flag| node.flags.contains(flag))
+        })
+        .cloned()
+        .collect()
+}
+
+fn filter_nodes_by_no_output(nodes: &[Node]) -> Vec<Node> {
+    nodes
+        .iter()
+        .filter(|node| !node.output.is_empty())
+        .cloned()
+        .collect()
+}
+
+
 fn main() {
     if let Ok(nodes) = parse_log_file("input/haiku.txt") {
-        println!("{:#?}", nodes);
+        let flags_to_filter = vec!["added".to_string(), "executing".to_string()];
+        let filtered_nodes = filter_nodes_by_flags(&filter_nodes_by_no_output(&nodes), &flags_to_filter);
+        println!("Filtered Nodes:\n{:#?}", filtered_nodes);
     } else {
         eprintln!("Error parsing log file");
     }
