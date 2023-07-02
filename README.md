@@ -55,6 +55,10 @@ cargo run -- --input=input/haiku.txt --include_flags=executing,adding --require_
 
 This will parse the log file `input/haiku.txt`, filter the nodes based on the flags "executing" and "adding", and exclude nodes without any output.
 
+## Chain with Open AI (again) 
+
+Use Chat GPT, or an [AI Formatting Tool](https://github.com/EthanJWright/ai_format) to take the output of Agent Parse and turn it into a summarized easy to work with document.
+
 ## Contributing
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
