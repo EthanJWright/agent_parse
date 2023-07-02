@@ -1,4 +1,5 @@
 use std::env;
+use colored::*;
 
 mod log_parser;
 
@@ -37,8 +38,11 @@ fn main() {
             filters.push(Box::new(log_parser::has_output));
         }
 
-        let filtered_nodes = log_parser::filter_nodes(&nodes, &filters);
-        println!("Filtered Nodes:\n{:#?}", filtered_nodes);
+        for node in log_parser::filter_nodes(&nodes, &filters) {
+            println!("Task: {}", node.task.yellow());
+            println!("Output:\n{}", node.output.green());
+            println!();
+        }
     } else {
         eprintln!("Error parsing log file");
     }
