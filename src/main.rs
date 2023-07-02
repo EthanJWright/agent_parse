@@ -100,31 +100,35 @@ fn parse_log_file(file_path: &str) -> io::Result<Vec<Node>> {
     Ok(nodes.clone())
 }
 
-fn filter_nodes_by_flags(nodes: &[Node], flags: &[String]) -> Vec<Node> {
+fn filter_nodes<T>(nodes: &[Node], filters: &[T]) -> Vec<Node>
+where
+    T: Fn(&Node) -> bool,
+{
     nodes
         .iter()
-        .filter(|node| {
-            flags.iter().any(|flag| node.flags.contains(flag))
-        })
+        .filter(|node| filters.iter().all(|filter| filter(node)))
         .cloned()
         .collect()
 }
 
-fn filter_nodes_by_no_output(nodes: &[Node]) -> Vec<Node> {
-    nodes
-        .iter()
-        .filter(|node| !node.output.is_empty())
-        .cloned()
-        .collect()
+fn has_matching_flags(node: &Node, flags: &[String]) -> bool {
+    flags.iter().any(|flag| node.flags.contains(flag))
 }
 
+fn has_output(node: &Node) -> bool {
+    !node.output.is_empty()
+}
 
 fn main() {
     if let Ok(nodes) = parse_log_file("input/haiku.txt") {
-        let flags_to_filter = vec!["added".to_string(), "executing".to_string()];
-        let filtered_nodes = filter_nodes_by_flags(&filter_nodes_by_no_output(&nodes), &flags_to_filter);
+        let filters: Vec<Box<dyn Fn(&Node) -> bool>> = vec![
+            Box::new(|node| has_matching_flags(node, &vec!["executing".to_string()])), // Filter by "added" flag
+            Box::new(has_output), // Filter by non-empty output
+        ];
+        let filtered_nodes = filter_nodes(&nodes, &filters);
         println!("Filtered Nodes:\n{:#?}", filtered_nodes);
     } else {
         eprintln!("Error parsing log file");
     }
 }
+
